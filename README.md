@@ -1,9 +1,13 @@
 # PyToque Class
 
 Class with methods to make requests to the ElToque API (Cuba).
+## Installation
+```python
+pip install pytoque
+```
 
 ## How to use
-Primero necesitaras solicitar un token personal desde el sitio de ElToque. 
+First you will need to request a personal token from the ElToque site. 
 
 ### Explanation
 https://eltoque.com/eltoque-abre-acceso-a-su-api-de-las-tasas-de-cambio
