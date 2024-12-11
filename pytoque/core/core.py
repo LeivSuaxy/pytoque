@@ -19,6 +19,13 @@ class PyToque:
         }
 
     def get_today(self, filters: list = None, force: bool = True) -> dict:
+        """
+        Get the data from the API for today
+        :param filters: List of filters to apply to the data, check README for more info.
+        :param force: Boolean to force the request to the API, default TRUE, use cache if FALSE
+        :return: Dict with the data obtained from the API. Format = { 'CURRENCY': VALUE }
+        """
+
         if filters:
             if not validate_filters(filters):
                 raise Exception('Incorrect filters')
@@ -37,6 +44,14 @@ class PyToque:
             return self.__do_request__(filters=filters, date=date)
 
     def get_date(self, date: str, filters: list = None, force: bool = True) -> dict:
+        """
+        Get the data from the API for a specific date
+        :param date: Date in format "YYYY-MM-DD"
+        :param filters: List of filters to apply to the data, check README for more info.
+        :param force: Boolean to force the request to the API, default TRUE, use cache if FALSE
+        :return: Dict with the data obtained from the API. Format = { 'CURRENCY': VALUE }
+        """
+
         if filters:
             if not validate_filters(filters):
                 raise Exception('Incorrect filters')
