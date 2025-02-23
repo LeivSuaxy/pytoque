@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="pytoque",  # Nombre del paquete
-    version="0.1.0",  # Versión inicial
+    version="0.1.1",  # Versión inicial
     packages=find_packages(),  # Encuentra todos los subpaquetes automáticamente
     install_requires=[
         "certifi==2024.8.30",

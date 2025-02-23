@@ -5,10 +5,7 @@ from pytoque.validators.validators import validate_date, validate_filters
 from pytoque.libs.cache import Cache
 
 class PyToque:
-    def __init__(self, api_key: str):
-        if not api_key:
-            raise Exception('Please provide an api_key')
-
+    def __init__(self, api_key: str = None):
         if type(api_key) != str:
             raise TypeError('Please provide a correct api_key')
 
@@ -18,14 +15,9 @@ class PyToque:
             'Authorization': f'Bearer {api_key}'
         }
 
-    def get_today(self, filters: list = None, force: bool = True) -> dict:
-        """
-        Get the data from the API for today
-        :param filters: List of filters to apply to the data, check README for more info.
-        :param force: Boolean to force the request to the API, default TRUE, use cache if FALSE
-        :return: Dict with the data obtained from the API. Format = { 'CURRENCY': VALUE }
-        """
+        self.api_key = api_key
 
+    def __get_today_api__(self, filters: list = None, force: bool = True) -> dict:
         if filters:
             if not validate_filters(filters):
                 raise Exception('Incorrect filters')
@@ -42,6 +34,23 @@ class PyToque:
             return data
         else:
             return self.__do_request__(filters=filters, date=date)
+
+    def __get_today_scrapping__(self, filters: list = None, force: bool = True) -> dict:
+        pass
+
+    def get_today(self, filters: list = None, force: bool = True) -> dict:
+        """
+        Get the data from the API for today if you have api_key
+        If not, the library will execute scrapping.
+        In case of scrap, the only currencies are EUR, USD, MLC.
+        :param filters: List of filters to apply to the data, check README for more info.
+        :param force: Boolean to force the request to the API, default TRUE, use cache if FALSE
+        :return: Dict with the data obtained from the API. Format = { 'CURRENCY': VALUE }
+        """
+        
+        if not self.api_key:
+            return self.__get_today_scrapping__(filters, force)
+        return self.__get_today_api__(filters, force)
 
     def get_date(self, date: str, filters: list = None, force: bool = True) -> dict:
         """
