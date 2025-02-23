@@ -3,10 +3,11 @@ import datetime
 from pytoque.utils.utils import get_url, filter_data
 from pytoque.validators.validators import validate_date, validate_filters
 from pytoque.libs.cache import Cache
+from pytoque.core.scrap import Scrapper
 
 class PyToque:
     def __init__(self, api_key: str = None):
-        if type(api_key) != str:
+        if api_key and type(api_key) != str:
             raise TypeError('Please provide a correct api_key')
 
         self.__cache__: Cache = Cache()
@@ -18,10 +19,6 @@ class PyToque:
         self.api_key = api_key
 
     def __get_today_api__(self, filters: list = None, force: bool = True) -> dict:
-        if filters:
-            if not validate_filters(filters):
-                raise Exception('Incorrect filters')
-
         date = datetime.date.today()
 
         # If force is False and Cache exists return cache
@@ -36,7 +33,16 @@ class PyToque:
             return self.__do_request__(filters=filters, date=date)
 
     def __get_today_scrapping__(self, filters: list = None, force: bool = True) -> dict:
-        pass
+        if force is False:
+            if self.__cache__.exists():
+                return self.__cache__.get()
+            date = datetime.date.today()
+            data = self.__do_scrap__(filters)
+            data['date'] = date.strftime('%Y-%m-%d')
+            self.__cache__.set(data)
+            return data
+
+        return self.__do_scrap__(filters)
 
     def get_today(self, filters: list = None, force: bool = True) -> dict:
         """
@@ -47,6 +53,9 @@ class PyToque:
         :param force: Boolean to force the request to the API, default TRUE, use cache if FALSE
         :return: Dict with the data obtained from the API. Format = { 'CURRENCY': VALUE }
         """
+        if filters:
+            if not validate_filters(filters):
+                raise Exception('Incorrect filters')
         
         if not self.api_key:
             return self.__get_today_scrapping__(filters, force)
@@ -95,4 +104,13 @@ class PyToque:
             return data.get('tasas')
 
         return filter_data(data.get('tasas'), filters)
+
+    @staticmethod
+    def __do_scrap__(filters: list):
+        scrapper = Scrapper()
+
+        if not filters:
+            return scrapper.get()
+
+        return filter_data(scrapper.get(), filters)
 
